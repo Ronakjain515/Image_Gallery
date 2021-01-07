@@ -11,3 +11,8 @@ def index(request):
     page_no = request.GET.get("page")
     page_image = paginator.get_page(page_no)
     return render(request, "index.html", context= {"imagePost": page_image})
+
+
+def viewDetailsPost(request, ImagePost):
+    print(ImagePost)
+    return render(request, "DetailPage.html")
