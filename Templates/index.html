@@ -2,9 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <title>Gallery</title>
 </head>
 <body>
 
+<!--Navbar Start here-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Gallery</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+    </ul>
+    <span class="navbar-text">
+      <button type="button" class="btn btn-primary">ADD</button>
+    </span>
+  </div>
+</nav>
+<!--Navbar ends here-->
+
+<!--Image Post starts here-->
+<div class="row" style="padding:20px 50px; width:100%">
+  {% for imageP in imagePost %}
+  <div class="col" style="margin: 25px 20px">
+    <center><a href="#"><img src="/media/{{ imageP.mainImage }}" height="300px" width="300px"></a></center>
+    <center><h4>{{ imageP.name }}</h4></center>
+  </div>
+  {% endfor %}
+</div>
+<!--Image Post ends here-->
+
+<!--Pagination starts here-->
+<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+    {% if imagePost.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ imagePost.previous_page_number }}">Previous</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">Previous</a>
+    </li>
+    {% endif %}
+    <li class="page-item"><a class="page-link" href="#">{{ imagePost.number }}</a></li>
+    {% if imagePost.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="?page={{ imagePost.next_page_number }}">Next</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <a class="page-link" href="#" tabindex="-1">Next</a>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+<!--Pagination ends here-->
+
 </body>
 </html>
+
+<style>
+div.gallery {
+  margin: 5px;
+  border: 1px solid #ccc;
+  float: left;
+  width: 180px;
+}
+
+div.gallery:hover {
+  border: 1px solid #777;
+}
+
+
+
+div.desc {
+  padding: 15px;
+  text-align: center;
+}
+</style>
