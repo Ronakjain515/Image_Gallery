@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Gallery</title>
 </head>
 <body>
@@ -27,7 +28,7 @@
 <div class="row" style="padding:20px 50px; width:100%">
   {% for imageP in imagePost %}
   <div class="col" style="margin: 25px 20px">
-    <center><a href="#"><img src="/media/{{ imageP.mainImage }}" height="300px" width="300px"></a></center>
+    <center><a href="#"><img id="{{ imageP.name }}_img" src="/media/{{ imageP.mainImage }}" height="300px" width="300px"></a></center>
     <center><h4>{{ imageP.name }}</h4></center>
   </div>
   {% endfor %}
@@ -62,6 +63,14 @@
 
 </body>
 </html>
+
+<script>
+$(document).ready(function(){
+  {% for imageP in imagePost %}
+  $('#{{ imageP.name }}_img').css('transform','rotate(' + {{ imageP.rotateAngle }} + 'deg)');
+  {% endfor %}
+});
+</script>
 
 <style>
 div.gallery {
