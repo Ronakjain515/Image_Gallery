@@ -28,7 +28,7 @@
 <div class="row" style="padding:20px 50px; width:100%">
   {% for imageP in imagePost %}
   <div class="col" style="margin: 25px 20px">
-    <center><a href="{{ imageP.name }}"><img id="{{ imageP.name }}_img" src="/media/{{ imageP.mainImage }}" height="300px" width="300px"></a></center>
+    <center><a href="Post/{{ imageP.name }}"><img id="{{ imageP.name }}_img" src="/media/{{ imageP.mainImage }}" height="300px" width="300px"></a></center>
     <center><h4>{{ imageP.name }}</h4></center>
   </div>
   {% endfor %}
@@ -63,15 +63,6 @@
 
 </body>
 </html>
-
-<script>
-$(document).ready(function(){
-  {% for imageP in imagePost %}
-  $('#{{ imageP.name }}_img').css('transform','rotate(' + {{ imageP.rotateAngle }} + 'deg)');
-  {% endfor %}
-});
-</script>
-
 <style>
 div.gallery {
   margin: 5px;

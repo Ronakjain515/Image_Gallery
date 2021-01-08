@@ -2,9 +2,120 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <title>Detail Page</title>
 </head>
 <body>
+<!--Navbar Start here-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Gallery</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+    </ul>
+    <span class="navbar-text">
+      <button type="button" class="btn btn-primary">ADD</button>
+    </span>
+  </div>
+</nav>
+<!--Navbar ends here-->
+
+<!--Main Post Section starts here-->
+<div class="row" style="width: 100%; padding:50px;">
+    <div class="col" style="text-align: center;">
+        <img id="{{ ImagePost.mainImage.id }}_img" src="/media/{{ ImagePost.mainImage.image }}" height="500px" width="500px">
+        <div class="row" style="width: 500px; margin: auto; justify-content: space-between; margin-top: 2px">
+            <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ ImagePost.mainImage.id }}_img', false)">-90</button>
+            <button type="button" class="btn btn-outline-primary" onclick="saveImage('{{ ImagePost.mainImage.id }}')">Save</button>
+            <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ ImagePost.mainImage.id }}_img', true)">+90</button>
+        </div>
+    </div>
+    <div class="col" style="padding:30px 0px;">
+        <h1>{{ ImagePost.name }}</h1>
+        <label>{{ ImagePost.date }}</label>
+        <br>
+        <br>
+        <br>
+        <h4>Tags</h4>
+        {% for tag in tags %}
+        <div style="background-color: 	#B8B8B8; display: inline-flex; padding: 7px 10px; border-radius: 25px">
+            {{ tag.tag }}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+<!--Main Post Section ends here-->
+
 
 </body>
 </html>
+
+<script>
+
+    $( document ).ready(function() {
+        $('#{{ ImagePost.mainImage.id }}_img').css('transform','rotate(0deg)');
+    });
+
+    function rotate(imageId, isClock)
+    {
+        var rotate = document.getElementById(imageId).style.transform;
+        var temp = rotate.split("rotate(")[1];
+        var angle = parseInt(temp.split("deg)")[0]);
+        if(isClock == true)
+        {
+            angle = angle + 90;
+        }
+        if(isClock == false)
+        {
+            angle = angle - 90;
+        }
+        $('#' + imageId).css('transform','rotate(' + angle + 'deg)');
+    }
+
+    function saveImage(imageId)
+    {
+        var rotate = document.getElementById(imageId + "_img").style.transform;
+        var temp = rotate.split("rotate(")[1];
+        var angle = parseInt(temp.split("deg)")[0]);
+        console.log(imageId);
+        console.log(angle);
+
+        $.ajax({
+            url: '{% url 'SaveImageAngle' %}',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({"imageId": imageId, "angle": angle}),
+            success: function (data) {
+                console.log(data);
+            }
+        });
+    }
+
+$.ajaxSetup({
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                     if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                         break;
+                     }
+                 }
+             }
+             return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     }
+});
+</script>
