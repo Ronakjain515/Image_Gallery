@@ -26,11 +26,11 @@
 <!--Main Post Section starts here-->
 <div class="row" style="width: 100%; padding:50px;">
     <div class="col" style="text-align: center;">
-        <img id="{{ ImagePost.mainImage.id }}_img" src="/media/{{ ImagePost.mainImage.image }}" height="500px" width="500px">
+        <img id="{{ ImagePost.mainImage.0.id }}_img" src="/media/{{ ImagePost.mainImage.0.image }}" height="500px" width="500px">
         <div class="row" style="width: 500px; margin: auto; justify-content: space-between; margin-top: 2px">
-            <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ ImagePost.mainImage.id }}_img', false)">-90</button>
-            <button type="button" class="btn btn-outline-primary" onclick="saveImage('{{ ImagePost.mainImage.id }}')">Save</button>
-            <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ ImagePost.mainImage.id }}_img', true)">+90</button>
+            <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ ImagePost.mainImage.0.id }}_img', false)">-90</button>
+            <button type="button" class="btn btn-outline-primary" onclick="saveImage('{{ ImagePost.mainImage.0.id }}')">Save</button>
+            <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ ImagePost.mainImage.0.id }}_img', true)">+90</button>
         </div>
     </div>
     <div class="col" style="padding:30px 0px;">
@@ -41,22 +41,37 @@
         <br>
         <h4>Tags</h4>
         {% for tag in tags %}
-        <div style="background-color: 	#B8B8B8; display: inline-flex; padding: 7px 10px; border-radius: 25px">
+        <div style="background-color: #B8B8B8; display: inline-flex; padding: 7px 10px; border-radius: 25px">
             {{ tag.tag }}
         </div>
         {% endfor %}
     </div>
 </div>
 <!--Main Post Section ends here-->
-
-
+<div class="row" style="width:100%;">
+{% for image in ImagePost.mainImage %}
+    {% if forloop.first %}
+    {% else %}
+        <div class="col" style="text-align: center; display:inline-block">
+            <img id="{{ image.id }}_img" src="/media/{{ image.image }}" height="250px" width="250px">
+            <div class="row" style="width: 250px; margin: auto; justify-content: space-between; margin-top: 2px">
+                <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ image.id }}_img', false)">-90</button>
+                <button type="button" class="btn btn-outline-primary" onclick="saveImage('{{ image.id }}')">Save</button>
+                <button type="button" class="btn btn-outline-primary" onclick="rotate('{{ image.id }}_img', true)">+90</button>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+</div>
 </body>
 </html>
 
 <script>
 
     $( document ).ready(function() {
-        $('#{{ ImagePost.mainImage.id }}_img').css('transform','rotate(0deg)');
+        {% for image in ImagePost.mainImage %}
+            $('#{{ image.id }}_img').css('transform','rotate(0deg)');
+        {% endfor %}
     });
 
     function rotate(imageId, isClock)

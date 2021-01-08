@@ -24,16 +24,15 @@ def index(request):
 
 def viewDetailsPost(request, ImagePostParameter):
     imagePostData = ImagePost.objects.values('id', 'name', 'date').filter(name=ImagePostParameter).first()
-    imagePostData["mainImage"] = Images.objects.values("id", "image").filter(imagePostId=imagePostData["id"]).first()
+    imagePostData["mainImage"] = Images.objects.values("id", "image").filter(imagePostId=imagePostData["id"])
+    print(imagePostData)
     tagData = Tags.objects.values('tag').filter(imagePostId=imagePostData["id"])
     return render(request, "DetailPage.html", context={"ImagePost": imagePostData, "tags": tagData})
 
 
 def saveImageAngle(request):
     received_json_data = json.loads(request.body)
-    print(received_json_data)
     image = Images.objects.values("image").filter(id=received_json_data["imageId"]).first()["image"]
-    print(image)
     import PIL
     from django.conf import settings
     from PIL import Image
