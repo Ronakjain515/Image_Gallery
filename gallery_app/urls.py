@@ -4,4 +4,6 @@ urlpatterns = [
     path('', views.index, name="index"),
     path('Post/<str:ImagePostParameter>', views.viewDetailsPost, name="viewDetailsPost"),
     path('SaveAngle', views.saveImageAngle, name="SaveImageAngle"),
+    path('searchTag', views.searchTag, name="searchTag"),
+    path('isTagComplete', views.isTagComplete, name="isTagComplete"),
 ]

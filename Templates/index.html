@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <title>Gallery</title>
 </head>
 <body>
@@ -11,25 +13,42 @@
 <!--Navbar Start here-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">Gallery</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="collapse navbar-collapse" id="navbarText">
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">ADD</a>
+      </li>
     </ul>
-    <span class="navbar-text">
-      <button type="button" class="btn btn-primary">ADD</button>
-    </span>
+    <form class="form-inline my-2 my-lg-0">
+      <input id="search-field" class="form-control mr-sm-2" placeholder="Search Tags" aria-label="Search">
+      <button type="button" class="btn btn-primary" onclick="search()">Search</button>
+    </form>
   </div>
 </nav>
 <!--Navbar ends here-->
+
+<!--Tags data will show here-->
+<div style="text-align: right; height: 30px" id="SearchedTagsDiv">
+</div>
+<!--Tags data ends here-->
+
 
 <!--Image Post starts here-->
 <div class="row" style="padding:20px 50px; width:100%">
   {% for imageP in imagePost %}
   <div class="col" style="margin: 25px 20px">
-    <center><a href="Post/{{ imageP.name }}"><img id="{{ imageP.name }}_img" src="/media/{{ imageP.mainImage }}" height="300px" width="300px"></a></center>
-    <center><h4>{{ imageP.name }}</h4></center>
+    <center>
+      <a href="Post/{{ imageP.name }}">
+        <img id="{{ imageP.name }}_img" src="/media/{{ imageP.mainImage }}" height="300px" width="300px">
+      </a>
+    </center>
+    <center>
+      <h4>{{ imageP.name }}</h4>
+    </center>
   </div>
   {% endfor %}
 </div>
@@ -40,7 +59,7 @@
   <ul class="pagination justify-content-center">
     {% if imagePost.has_previous %}
     <li class="page-item">
-      <a class="page-link" href="?page={{ imagePost.previous_page_number }}">Previous</a>
+      <a class="page-link" href="javascript:changePage({{ imagePost.previous_page_number }})">Previous</a>
     </li>
     {% else %}
     <li class="page-item disabled">
@@ -50,7 +69,7 @@
     <li class="page-item"><a class="page-link" href="#">{{ imagePost.number }}</a></li>
     {% if imagePost.has_next %}
     <li class="page-item">
-      <a class="page-link" href="?page={{ imagePost.next_page_number }}">Next</a>
+      <a class="page-link" href="javascript:changePage({{ imagePost.next_page_number }})">Next</a>
     </li>
     {% else %}
     <li class="page-item disabled">
@@ -63,6 +82,126 @@
 
 </body>
 </html>
+
+<script>
+var searchedTags = []
+
+$(function() {
+  $("#search-field").autocomplete({
+    source: "{% url 'searchTag' %}",
+    minLength: 1,
+  });
+});
+
+$( document ).ready(function() {
+if ( window.history.replaceState ) {
+  window.history.replaceState( null, null, window.location.href );
+}
+
+{% for tag in tags %}
+searchedTags.push('{{ tag }}');
+appendSearchedTag('{{ tag }}');
+{% endfor %}
+});
+
+  function search()
+  {
+    searchData = document.getElementById("search-field").value;
+    if(searchData === "")
+    {
+      alert("Please Type some value in search box");
+      return;
+    }
+    // checking if tag is complete or not from database
+    $.ajax({
+            url: '{% url 'isTagComplete' %}',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            data: JSON.stringify({"tagData": searchData}),
+            success: function (data) {
+                if(data.result === "true")
+                {
+                   document.getElementById("search-field").value = "";
+                   searchedTags.push(searchData);
+                   changePage({{ imagePost.number }});
+                }
+                if(data.result === "false")
+                {
+                  alert("Tag not matched in Database");
+                }
+            }
+     });
+  }
+
+  function appendSearchedTag(tagData)
+  {
+    var createdDiv = document.createElement("div");
+    createdDiv.style.backgroundColor = "#B8B8B8";
+    createdDiv.style.display = "inline-flex";
+    createdDiv.style.padding = "7px 10px";
+    createdDiv.style.borderRadius = "25px";
+    createdDiv.style.margin = "5px";
+    var textNode = document.createTextNode(tagData);
+    createdDiv.appendChild(textNode);
+    document.getElementById("SearchedTagsDiv").appendChild(createdDiv);
+  }
+
+  function changePage(pageIndex)
+  {
+    var form = document.createElement("form");
+    var element1 = document.createElement("input");
+    var element2 = document.createElement("input");
+    var element3 = document.createElement("input");
+
+    form.method = "POST";
+    form.action = "{% url 'index' %}";
+
+    element1.type="hidden";
+    element1.value="{{ csrf_token }}";
+    element1.name="csrfmiddlewaretoken";
+    form.appendChild(element1);
+
+    element2.type="hidden";
+    element2.value=pageIndex;
+    element2.name="pageno";
+    form.appendChild(element2);
+
+    element3.type="hidden";
+    element3.value=searchedTags;
+    element3.name="tags";
+    form.appendChild(element3);
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+
+$.ajaxSetup({
+     beforeSend: function(xhr, settings) {
+         function getCookie(name) {
+             var cookieValue = null;
+             if (document.cookie && document.cookie != '') {
+                 var cookies = document.cookie.split(';');
+                 for (var i = 0; i < cookies.length; i++) {
+                     var cookie = jQuery.trim(cookies[i]);
+                     // Does this cookie string begin with the name we want?
+                     if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                         break;
+                     }
+                 }
+             }
+             return cookieValue;
+         }
+         if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {
+             // Only send the token to relative URLs i.e. locally.
+             xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+         }
+     }
+});
+
+</script>
+
 <style>
 div.gallery {
   margin: 5px;
