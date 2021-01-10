@@ -4,21 +4,22 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <title>Detail Page</title>
+    <title>{{ ImagePost.name }}</title>
 </head>
 <body>
 <!--Navbar Start here-->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <a class="navbar-brand" href="#">Gallery</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
-  <div class="collapse navbar-collapse" id="navbarText">
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'addImagePost' %}">ADD</a>
+      </li>
     </ul>
-    <span class="navbar-text">
-      <button type="button" class="btn btn-primary">ADD</button>
-    </span>
   </div>
 </nav>
 <!--Navbar ends here-->
@@ -95,8 +96,6 @@
         var rotate = document.getElementById(imageId + "_img").style.transform;
         var temp = rotate.split("rotate(")[1];
         var angle = parseInt(temp.split("deg)")[0]);
-        console.log(imageId);
-        console.log(angle);
 
         $.ajax({
             url: '{% url 'SaveImageAngle' %}',
@@ -105,7 +104,14 @@
             contentType: 'application/json',
             data: JSON.stringify({"imageId": imageId, "angle": angle}),
             success: function (data) {
-                console.log(data);
+                if(data.result == "true")
+                {
+                    alert("Image save successfully");
+                }
+                if(data.result == "false")
+                {
+                    alert("Something went wrong..");
+                }
             }
         });
     }

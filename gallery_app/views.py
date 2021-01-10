@@ -1,7 +1,7 @@
 import json
 
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from pip._vendor.requests import Response
 
 from .models import ImagePost, Tags, Images
@@ -40,7 +40,6 @@ def index(request):
 def viewDetailsPost(request, ImagePostParameter):
     imagePostData = ImagePost.objects.values('id', 'name', 'date').filter(name=ImagePostParameter).first()
     imagePostData["mainImage"] = Images.objects.values("id", "image").filter(imagePostId=imagePostData["id"])
-    print(imagePostData)
     tagData = Tags.objects.values('tag').filter(imagePostId=imagePostData["id"])
     return render(request, "DetailPage.html", context={"ImagePost": imagePostData, "tags": tagData})
 
@@ -66,10 +65,36 @@ def isTagComplete(request):
     result = "false"
     try:
         tagData = json.loads(request.body)["tagData"]
-        tagCount = Tags.objects.filter(tag__iexact=tagData).count()
+        tagCount = Tags.objects.filter(tag=tagData).count()
         if tagCount > 0:
             print(tagCount)
             result = "true"
     except:
         pass
     return JsonResponse({"result": result})
+
+
+def addImagePost(request):
+    return render(request, "addImagePost.html")
+
+
+def addImagePost_Submit(request):
+
+    # saving main post data
+    name = request.POST.get("Name")
+    imagePost = ImagePost(name=name)
+    imagePost.save()
+
+    # saving tags data
+    noOfTags = request.POST.get("noOfTags")
+    for tagNo in range(1, int(noOfTags) + 1):
+        tag = request.POST.get("Tag_" + str(tagNo))
+        tagPost = Tags(imagePostId=imagePost, tag=tag)
+        tagPost.save()
+
+    # saving images data
+    for img in request.FILES.getlist("image"):
+        image = Images(imagePostId=imagePost, image=img)
+        image.save()
+
+    return redirect("index")

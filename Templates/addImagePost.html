@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>ADD Image Post</title>
+</head>
+<body>
+
+<!--Navbar starts here-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="#">Gallery</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="{% url 'addImagePost' %}">ADD</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+<!--Navbar ends here-->
+
+<form style="margin:50px;" action="{% url 'AddImagePost_Submit' %}" method="post" enctype="multipart/form-data">
+{% csrf_token %}
+  <div class="form-group row">
+    <label for="Name" class="col-sm-2 col-form-label">Name</label>
+    <div class="col-sm-3">
+      <input type="text" class="form-control" id="Name" name="Name" pattern="[a-zA-Z ]*" placeholder="Enter Name" required>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label class="col-sm-2 col-form-label">Tags</label>
+    <div class="col-sm-3">
+      <div id="TagParentDiv">
+        <input type="hidden" name="noOfTags" id="noOfTags" value="1">
+        <input type="text" class="form-control" pattern="[a-zA-Z]*" id="Tag_1" name="Tag_1" required placeholder="Enter Tag Name" style="margin:10px 0px">
+      </div>
+      <button type="button" style="margin:10px;" class="btn btn-primary" onclick="addTagField()">Add Tag</button>
+    </div>
+  </div>
+
+  <div class="form-group row">
+    <label for="image" class="col-sm-2 col-form-label">Image (Multiple)</label>
+    <div class="col-sm-3">
+      <input type="file" multiple class="form-control" name="image" id="image" onchange="PreviewImage()" required>
+    </div>
+  </div>
+
+  <div id="ImagePreviewDiv" style="width:550px;">
+<!--    <img src="" height="250px" width="250px" id="temp">-->
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+
+</body>
+</html>
+
+<script>
+    var TagNo = 2;
+
+    function addTagField()
+    {
+      var TagDiv = document.getElementById("Tag_1");
+      var noOfTagsField = document.getElementById("noOfTags");
+      noOfTagsField.value = TagNo;
+      var TagDivClone = TagDiv.cloneNode(true);
+      TagDivClone.id = "Tag_" + TagNo;
+      TagDivClone.name = "Tag_" + TagNo;
+      TagDivClone.value = "";
+      TagNo = TagNo + 1;
+      document.getElementById("TagParentDiv").appendChild(TagDivClone);
+    }
+
+    function PreviewImage() {
+        $("#ImagePreviewDiv").empty();
+        for(var i = 0; i < $('#image')[0].files.length; i++)
+        {
+          var oFReader = new FileReader();
+          oFReader.readAsDataURL(document.getElementById("image").files[i]);
+
+          oFReader.onload = function (oFREvent) {
+            var createTagImg = document.createElement("img");
+            createTagImg.style.width = "250px";
+            createTagImg.style.backgroundColor = "blue";
+            createTagImg.style.height = "250px";
+            createTagImg.style.border = "5px solid #555";
+            console.log("wo");
+            createTagImg.src = oFREvent.target.result;
+            document.getElementById("ImagePreviewDiv").appendChild(createTagImg);
+          };
+        }
+    };
+
+</script>
